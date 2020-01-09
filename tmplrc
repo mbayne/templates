@@ -1,0 +1,532 @@
+#/bin/ksh
+##############################################################################
+# Check to make sure that appropriate vars are set
+##############################################################################
+if [ -z ${TMPL_HOME} ] ; then
+  echo "TMPL_HOME needs to be set!"
+  return 0
+fi
+
+if [[ -z $TMPL_AUTHOR ]] ; then
+  echo "Warning: TMPL_AUTHOR is not set!"
+  export TMPL_AUTHOR="Nobody Important"
+fi
+
+##############################################################################
+# tmplhelp - show the usage
+##############################################################################
+function tmplhelp {
+  echo "create java classes:"
+  echo "  *crtclass   <class> <package> create a plain old java object(pojo)"
+  echo "  *crtservice   <class> <package> create a spring service component"
+  echo "  *crtentity   <class> <package> create a spring entity component"
+  echo "  *crtrepo   <class> <package> <entity> create a spring repository component"
+  echo "  crtimpl     <class> <package> create a interface/class implementation"
+  echo "  *crtejb3ssb <class> <package> create an stateless session bean"
+  echo "  *crtsingle  <class> <package> create a singleton class"
+  echo ""
+  echo "create vogen data file:"
+  echo "  *crthibdata <class> <package> create a vogen hibernate file"
+  echo "  *crthibentity  <class> <package> create a vogen hibernate file"
+  echo ""
+  echo "create drools file:"
+  echo "  *crtdrools <filename> <package> create a drools file"
+  echo ""
+  echo "create testcases:"
+  echo "  *crtjunit   <class> <package> create a junit testcase"
+  echo "  *crtejb3junit <class> <package> create a junit testcase for EJB"
+  echo "  crtejbjunit <class> <package> create a junit testcase for EJB"
+  echo ""
+  echo "create build scripts:"
+  echo "  *crtbuild    <project>         create a standard build.xml file"
+  echo "  *crtbuildcmd                   create windows build file"
+  echo "  *crtbuildejb <project>         create an EJB build file"
+  echo ""
+  echo "create projects:"
+  echo "  *crtproj     <project>         create a standard project"
+  echo "  *crtejb3proj <project>         create an EJB project"
+  echo "  crtear       <ear>             create a standard ear project"
+  echo ""
+  echo "other functions:"
+  echo "  *build                        smart build will build the current"
+  echo "                                  project if a build.sh is present"
+  echo "                                  otherwise it will build the last"
+  echo "                                  project that was built"
+  echo "  *jargrep <class>              top down jar grep"
+  echo " * supported"
+} # END OF tmplhelp
+
+##############################################################################
+# build - a convienent function that will allow you to build the project
+#         anywhere within the project as long as it was originally run from 
+#         the top of a project where the build.sh is defined
+##############################################################################
+function build {
+
+  if [ -f build.sh ] ; then
+    LASTPROJ=`pwd`
+    ./build.sh "$@"
+  else
+    cd $LASTPROJ
+    ./build.sh "$@"
+    cd -
+  fi
+} # END OF build
+
+##############################################################################
+# crtjunit - create a template junit test case module
+##############################################################################
+function crtjunit {
+  if [ -z $1 ] ; then
+    Tfn="JunitTC"
+  else
+    Tfn=$1
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/class.junit.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.java
+} # END OF crtjunit
+
+##############################################################################
+# crtejb3junit - create a template junit test case module for ejb3
+##############################################################################
+function crtejb3junit {
+  if [ -z $1 ] ; then
+    Tfn="JunitTC"
+  else
+    Tfn=$1
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/class.junit.jboss.ejb3.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.java
+} # END OF crtejb3junit
+
+##############################################################################
+# crtejbjunit - create a template junit test case module for ejb
+##############################################################################
+function crtejbjunit {
+  if [ -z $1 ] ; then
+    Tfn="JunitTC"
+  else
+    Tfn=$1
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="";
+  else
+    Tpkg="package $2;"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  sed -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<PACKAGE>/$Tpkg/" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" ${TMPL_HOME}/JunitTCEJB.java.tmpl > ${Tfn}.java
+} # END OF crtejbjunit
+
+##############################################################################
+# crtclass - create a template java src class
+##############################################################################
+function crtclass {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/class.tmpl ${TMPL_HOME}/java/class.examplemeth.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" -e "s/<COMPANY>/${TMPL_COMPANY}/g" > ${Tfn}.java
+
+} # END OF crtclass
+
+##############################################################################
+# crtservice - create a spring service
+##############################################################################
+function crtservice {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/spring.service.tmpl ${TMPL_HOME}/java/class.spring.service.examplemeth.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.java
+
+} # END OF crtservice
+
+##############################################################################
+# crtentity - create a spring entity
+##############################################################################
+function crtentity {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/spring.entity.tmpl |sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.java
+
+} # END OF crtentity
+
+##############################################################################
+# crtrepo - create a spring repository
+##############################################################################
+function crtrepo {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  if [ -z $3 ] ; then
+    Tentity="Object"
+  else
+    Tentity="$3"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/spring.repo.tmpl |sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" -e "s/<ENTITY>/$Tentity/g" > ${Tfn}.java
+
+} # END OF crtrepo
+
+##############################################################################
+# crtdrools - create a template drools src file
+##############################################################################
+function crtdrools {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide file name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/drl/header.tmpl ${TMPL_HOME}/drl/drl.tmpl ${TMPL_HOME}/drl/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" -e "s/<PROJECT>/${TMPL_PROJECT}/g" > ${Tfn}.drl
+
+} # END OF crtdrools
+
+##############################################################################
+# crthibdata - create a template vogen data file
+##############################################################################
+function crthibdata {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/vogen/hib.example.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.data
+
+} # END OF crthibdata
+
+##############################################################################
+# crthibentity - create a simple template from vogen
+##############################################################################
+function crthibentity {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/vogen/hib.simple.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.data
+
+} # END OF crthibentity
+
+##############################################################################
+# crtsingle - create a singleton class
+##############################################################################
+function crtsingle {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/class.single.tmpl ${TMPL_HOME}/java/class.examplemeth.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.java
+} # END OF crtsingle
+
+##############################################################################
+# crtejb3ssb - create a stateful session bean that adheres to ejb3
+##############################################################################
+function crtejb3ssb {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide class name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg="test"
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+
+  #create the local interface
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/class.jboss.ejb3.ssb.localint.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > Local${Tfn}.java
+  
+  #create the remote interface
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/class.jboss.ejb3.ssb.remoteint.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > Remote${Tfn}.java
+
+  #create the Bean
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/class.jboss.ejb3.ssb.impl.tmpl ${TMPL_HOME}/java/class.examplemeth.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.java
+
+} # END OF crtejb3ssb
+
+##############################################################################
+# crtimpl - create a template java interface and impl
+##############################################################################
+function crtimpl {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide interface name"
+    return 0
+  else
+    Tfn="$1"
+  fi
+
+  if [ -z $2 ] ; then
+    Tpkg=""
+  else
+    Tpkg="$2"
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  sed -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<PACKAGE>/$Tpkg/" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" ${TMPL_HOME}/TemplateInterface.java.tmpl > ${Tfn}.java
+  sed -e "s/<CLASS>/${Tfn}Impl/g" -e "s/<DATE>/$Tdate/g" -e "s/<PACKAGE>/$Tpkg/" -e "s/<IMPLEMENTS>/implements $Tfn /" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" ${TMPL_HOME}/TemplateClass.java.tmpl > ${Tfn}Impl.java
+} # END OF crtimpl
+
+##############################################################################
+# crtbuild - create a new build.xml
+##############################################################################
+function crtbuild {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide project name"
+    return 0
+  else
+    Tprojname=$1
+  fi
+
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+  let x=`echo ${PWD#*/projects} | tr "/" " " | wc -w`
+  Ttop=""
+  while [ $x -gt 0 ]
+  do
+    Ttop="$Ttop../"
+    let x=x-1
+  done
+
+  SDIR=${TMPL_HOME}/build/snippets
+  #
+  # Create the build.sh
+  #
+  cat ${TMPL_HOME}/build/build.sh.tmpl  \
+  | sed -e "s/<YEAR>/$Tyear/g"          \
+        -e "s/<PROJECT>/$Tprojname/g"   \
+        -e "s/<DATE>/$Tdate/g"          \
+        -e "s/<AUTHOR>/${TMPL_AUTHOR}/g"\
+      > build.sh
+  chmod +x build.sh 
+
+  #
+  # Create the build.cmd
+  #
+  cat ${TMPL_HOME}/build/build.cmd.tmpl  \
+  | sed -e "s/<YEAR>/$Tyear/g"          \
+        -e "s/<PROJECT>/$Tprojname/g"   \
+        -e "s/<DATE>/$Tdate/g"          \
+        -e "s+<TOP>+$Ttop+g"            \
+        -e "s/<AUTHOR>/${TMPL_AUTHOR}/g"\
+      > build.cmd
+  chmod +x build.cmd 
+
+  #
+  # Create the build.xml
+  #
+  cat ${SDIR}/build.xml.header          \
+      ${SDIR}/build.xml.path            \
+      ${SDIR}/build.xml.help            \
+      ${SDIR}/build.xml.depend          \
+      ${SDIR}/build.xml.compile         \
+      ${SDIR}/build.xml.jar             \
+      ${SDIR}/build.xml.dist            \
+      ${SDIR}/build.xml.test.compile    \
+      ${SDIR}/build.xml.clean           \
+      ${SDIR}/build.xml.footer          \
+  | sed -e "s/<YEAR>/$Tyear/g"           \
+        -e "s/<PROJECT>/$Tprojname/g"    \
+        -e "s/<DATE>/$Tdate/g"           \
+        -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" \
+      > build.xml
+
+  echo "... build files for $Tprojname created!"
+} # END OF crtbuild
+
+##############################################################################
+# crtbuildcmd - create a windows build script
+##############################################################################
+function crtbuildcmd {
+  Tdate=`date +%m-%d-%Y`
+  Tyear=`date +%Y`
+  let x=`echo ${PWD#*/projects} | tr "/" " " | wc -w`
+  Ttop=""
+  while [ $x -gt 0 ]
+  do
+    Ttop="$Ttop../"
+    let x=x-1
+  done
+
+  #
+  # Create the build.cmd
+  #
+  cat ${TMPL_HOME}/build/build.cmd.tmpl  \
+  | sed -e "s/<YEAR>/$Tyear/g"          \
+        -e "s/<DATE>/$Tdate/g"          \
+        -e "s+<TOP>+$Ttop+g"            \
+        -e "s/<AUTHOR>/${TMPL_AUTHOR}/g"\
+      > build.cmd
+  chmod +x build.cmd 
+
+  echo "... windows build file created!"
+} # END OF crtbuildcmd
+
+
+##############################################################################
+# cdx - auto cd to a given directory
+##############################################################################
+function cdx {
+  #list=`find $TOP -name $1 -type d`
+  list=`find . -name $1 -type d|egrep -v 'build|dist|log'`
+  i=0
+  for var in $list ; do
+    i=$((i+1))
+  done
+
+  if [[ $i -gt 1 ]] ; then
+    i=0
+    for var in $list ; do
+      echo "$i" $var
+      i=$((i+1))
+    done
+    read selection
+    i=0
+    for var in $list ; do
+      if [[ `echo $i` -eq $selection ]] ; then
+        cd $var
+        break
+      fi
+      i=$((i+1))
+    done
+  elif [[ $i -eq 1 ]] ; then
+    cd $list
+  fi
+  pwd
+} # END OF cdx
+
+
+##############################################################################
+# jargrep - grep jar(s) for a class or search string
+##############################################################################
+function jargrep {
+  if [ -z $1 ] ; then
+    echo "ERROR: please provide search string"
+    return 0
+  fi
+
+  for i in `find . -name "*.jar"`
+    do echo $i;jar tvf $i|grep $1
+  done;
+} # END OF jargrep
+

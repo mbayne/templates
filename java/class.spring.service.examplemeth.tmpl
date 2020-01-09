@@ -1,0 +1,27 @@
+  /** *********************************************************************
+   *  Invokes the example method
+   ************************************************************************
+   */
+  public ResponseEntity<Object> doSomething(Object request) {
+    /*---- Local Variable Declares ----*/
+    ResponseEntity<Object> delegateRsp = null;
+
+    /*-------- Start of Code ----------*/
+    MB: {
+      if (request == null) {
+        LOG.error("request can't be null!");
+        delegateRsp = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        break MB;
+      } /*endif*/
+
+      try {
+      } catch (Throwable e) {
+        LOG.error("Caught exception", e);
+      } /*endtry*/
+
+      delegateRsp = new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
+    } /*endMB*/
+
+    return(delegateRsp);
+  } /* END OF doSomething */
+

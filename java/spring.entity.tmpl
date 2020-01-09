@@ -1,0 +1,115 @@
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+/** ***********************************************************************
+ *
+ * CLASS: <CLASS> implementation.
+ *
+ * @author <AUTHOR>
+ *
+ * @version 1.0
+ *
+ **************************************************************************
+ */
+@Entity
+@Table(name="<CLASS>")
+public class <CLASS> <IMPLEMENTS>{
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  @Column(name="id")
+  private Long id;
+
+  //@Column(name="some_col",unique=false)
+  private String someCol;
+
+  //@OneToMany(mappedBy="parentInstance",
+  //          cascade = { CascadeType.ALL },
+  //          fetch = FetchType.EAGER)
+  private List<Object> elements;
+
+  //@ManyToOne()
+  //@JoinColumn(name="foreign_key",
+  //            referencedColumnName="id")
+  private Object parent;
+
+
+  /** *********************************************************************
+   *  Default constructor
+   ************************************************************************
+   */
+  public <CLASS>() {
+    /*---- Local Variable Declares ----*/
+
+    /*--------- Start of Code ---------*/
+
+    return;
+  } /* END OF constructor <CLASS> */
+
+ 
+  /** *********************************************************************
+   *  Getter for id.
+   ************************************************************************
+   */
+  public Long getId() {
+    /*---- Local Variable Declares ----*/
+
+    /*--------- Start of Code ---------*/
+
+    return(this.id);
+  } /* END OF getId */
+
+ 
+  /** *********************************************************************
+   *  Setter for id.
+   ************************************************************************
+   */
+  public void setId(Long id) {
+    /*---- Local Variable Declares ----*/
+
+    /*--------- Start of Code ---------*/
+    this.id = id;
+  } /* END OF setId */
+
+ 
+  /** *********************************************************************
+   *  Getter for someCol.
+   ************************************************************************
+   */
+  public String getSomeCol() {
+    /*---- Local Variable Declares ----*/
+
+    /*--------- Start of Code ---------*/
+
+    return(this.someCol);
+  } /* END OF getSomeCol */
+
+ 
+  /** *********************************************************************
+   *  Setter for someCol.
+   ************************************************************************
+   */
+  public void setSomeCol(String value) {
+    /*---- Local Variable Declares ----*/
+
+    /*--------- Start of Code ---------*/
+    this.someCol = value;
+  } /* END OF setSomeCol */
+
+} /* END OF class <CLASS> */
+
+/* END OF SOURCE FILE */
+
+ 
+ 
+  

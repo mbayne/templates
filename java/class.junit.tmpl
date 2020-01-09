@@ -1,0 +1,78 @@
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
+import java.util.logging.Logger;
+
+/** ***********************************************************************
+**
+** A brief description of the class here
+**
+** @author <AUTHOR>
+**
+** @version 1.0
+**
+***************************************************************************
+*/
+public class <CLASS> extends TestCase {
+  /*---- Class Variable Declares ----*/
+  private static Logger C_log = Logger.getLogger(<CLASS>.class.getName());
+
+  /*-------- Start of Code ----------*/
+  /** *********************************************************************
+  **
+  ** The class constructor
+  **
+  ** @param Pname
+  **   name of the test case
+  **
+  *************************************************************************
+  */
+  public <CLASS>(String Pname) {
+    /*---- Local Variable Declares ----*/
+
+    /*--------- Start of Code ---------*/
+    super(Pname);
+
+    return;
+  } /* END OF constructor <CLASS> */
+
+
+  /** *********************************************************************
+  **
+  ** Setup the test
+  **
+  *************************************************************************
+  */
+  public void setUp() {
+    /*---- Local Variable Declares ----*/
+
+    /*-------- Start of Code ----------*/
+
+    return;
+  } /* END OF setUp */
+
+
+  /** *********************************************************************
+  **
+  ** Test the basics
+  **
+  *************************************************************************
+  */
+  public void testBasic() {
+    /*---- Local Variable Declares ----*/
+
+    /*-------- Start of Code ----------*/
+    MB: {
+      try {
+        /*----------------------------------------------------------------+
+        | Here's a typical comment box                                    |
+        +----------------------------------------------------------------*/
+      } catch (Throwable Te) {
+        C_log.severe("Caught exception: "+Te.toString());
+        Te.printStackTrace();
+      } /*endtry*/
+    } /*endMB*/
+
+    return;
+  } /* END OF testBasic */
+

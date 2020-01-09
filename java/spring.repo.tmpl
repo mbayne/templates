@@ -1,0 +1,21 @@
+import java.util.List;
+import org.springframework.data.repository.CrudRepository;
+
+/** ***********************************************************************
+ *
+ * Interface: <CLASS> repository implementation.
+ *
+ * @author <AUTHOR>
+ *
+ * @version 1.0
+ *
+ **************************************************************************
+ */
+public interface <CLASS> extends CrudRepository<<ENTITY>, Long> {
+  <ENTITY> findById(Long id);
+  //<ENTITY> findBySomeCol(String col);
+  //Long deleteBySomeCol(String col);
+
+} /* END OF interface <CLASS> */
+
+/* END OF SOURCE FILE */

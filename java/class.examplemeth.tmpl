@@ -1,0 +1,23 @@
+  /** *********************************************************************
+   *  Invokes the example method
+   ************************************************************************
+   */
+  public String example(String message) {
+    /*---- Local Variable Declares ----*/
+
+    /*-------- Start of Code ----------*/
+    MB: {
+      if (message == null) {
+        LOG.error("mesage is null!");
+        break MB;
+      } /*endif*/
+
+      try {
+      } catch (Throwable Te) {
+        LOG.error("Caught exception", Te);
+      } /*endtry*/
+    } /*endMB*/
+
+    return(message);
+  } /* END OF example */
+

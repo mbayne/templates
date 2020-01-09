@@ -181,7 +181,7 @@ function crtservice {
   Tdate=`date +%m-%d-%Y`
   Tyear=`date +%Y`
 
-  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/spring.service.tmpl ${TMPL_HOME}/java/class.spring.service.examplemeth.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" > ${Tfn}.java
+  cat ${TMPL_HOME}/java/header.tmpl ${TMPL_HOME}/java/spring.service.tmpl ${TMPL_HOME}/java/class.spring.service.examplemeth.tmpl ${TMPL_HOME}/java/footer.tmpl|sed -e "s/<YEAR>/$Tyear/g" -e "s/<PACKAGE>/$Tpkg/g" -e "s/<CLASS>/$Tfn/g" -e "s/<DATE>/$Tdate/g" -e "s/<IMPLEMENTS>//" -e "s/<AUTHOR>/${TMPL_AUTHOR}/g" -e"s/<COMPANY>/${TMPL_COMPANY}/g" > ${Tfn}.java
 
 } # END OF crtservice
 
